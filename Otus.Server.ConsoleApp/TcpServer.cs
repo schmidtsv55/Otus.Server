@@ -10,9 +10,11 @@ public class TcpServer : IDisposable
 
     private Socket? listenerSocket = null;
     private int _port;
+    private SimpleStore _simpleStore;
 
-    public TcpServer(int port)
+    public TcpServer(SimpleStore simpleStore, int port)
     {
+        _simpleStore = simpleStore;
         _port = port;
     }
 
@@ -47,8 +49,8 @@ public class TcpServer : IDisposable
     }
     private async Task ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)
     {
-        var arrayPool = ArrayPool<byte>.Shared;
-        var buffer = arrayPool.Rent(1_024);
+        ArrayPool<byte>? arrayPool = ArrayPool<byte>.Shared;
+        byte[] buffer = arrayPool.Rent(1_024);
 
         try
         {
@@ -59,7 +61,11 @@ public class TcpServer : IDisposable
                 {
                     break;
                 }
-                WriteData(buffer, recieveSize);
+                CommandParts<ReadOnlySpan<byte>> commandParts =
+                    CommandParser.Parse(buffer.AsSpan().Slice(0, recieveSize));
+
+                ArraySegment<byte> response = GetResponse(commandParts);
+                await clientSocket.SendAsync(response, cancellationToken);
             }
         }
         finally
@@ -72,17 +78,30 @@ public class TcpServer : IDisposable
 
     }
 
-    private void WriteData(byte[] buffer, int size)
+    private ArraySegment<byte> GetResponse(CommandParts<ReadOnlySpan<byte>> commandParts)
     {
-        CommandParts<ReadOnlySpan<byte>> result =
-            CommandParser.Parse(buffer.AsSpan().Slice(0, size));
-        Console.WriteLine("------------------");
-        string command = Encoding.UTF8.GetString(result.Command);
-        Console.WriteLine($"Command {command}");
-        string key = Encoding.UTF8.GetString(result.Key);
-        Console.WriteLine($"Key {key}");
-        string value = Encoding.UTF8.GetString(result.Value);
-        Console.WriteLine($"Value {value}");
-        Console.WriteLine("------------------");
+        if (commandParts.Key.Length == 0)
+        {
+            return TcpServerResponses.EmptyKey;
+        }
+        else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.GetCommand))
+        {
+            byte[]? value = _simpleStore.Get(Encoding.UTF8.GetString(commandParts.Key));
+            return value == null || value.Length == 0 ? TcpServerResponses.Nil : value;
+        }
+        else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.SetCommand))
+        {
+            _simpleStore.Set(Encoding.UTF8.GetString(commandParts.Key), commandParts.Value.ToArray());
+            return TcpServerResponses.Ok;
+        }
+        else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.DeleteCommand))
+        {
+            _simpleStore.Delete(Encoding.UTF8.GetString(commandParts.Key));
+            return TcpServerResponses.Ok;
+        }
+        else
+        {
+            return TcpServerResponses.UnknownCommand;
+        }
     }
 }
