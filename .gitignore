@@ -367,3 +367,4 @@ Docker-compose*
 docker-compose.yml
 # VS code 
 .vscode/
+reports/
