@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using Otus.NBomber.ConsoleApp.DTO;
 
 namespace Otus.NBomber.ConsoleApp;
 
@@ -21,9 +23,9 @@ public class Client : IDisposable
 
         await _socket.ConnectAsync(localEndPoint);
     }
-    public async Task<string> SetAsync(string key, byte[] value)
+    public async Task<string> SetAsync(string key, UserProfile profile)
     {
-        await SentAsync(SetCommand, Encoding.UTF8.GetBytes(key), value);
+        await SentAsync(SetCommand, Encoding.UTF8.GetBytes(key), JsonSerializer.SerializeToUtf8Bytes(profile));
         return await ReceiveAsync();
     }
     async Task SentAsync(params byte[][] args)
@@ -60,7 +62,7 @@ public class Client : IDisposable
         }
         finally
         {
-            arrayPool.Return(buffer);
+            arrayPool.Return(buffer, clearArray: true);
         }
 
     }
@@ -79,7 +81,7 @@ public class Client : IDisposable
         }
         finally
         {
-            arrayPool.Return(buffer);
+            arrayPool.Return(buffer, clearArray: true);
 
         }
 

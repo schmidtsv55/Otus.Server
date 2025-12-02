@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 
 namespace Otus.Server.ConsoleApp;
 
@@ -8,13 +9,13 @@ public class SimpleStore : IDisposable
     private long _setCount, _getCount, _deleteCount;
     private Dictionary<string, byte[]?> _dsta = new();
 
-    public void Set(string key, byte[] value)
+    public void Set(string key, UserProfile? profile)
     {
         try
         {
             _lock.EnterWriteLock();
             Interlocked.Increment(ref _setCount);
-            _dsta[key] = value;
+            _dsta[key] = profile == null ? null : JsonSerializer.SerializeToUtf8Bytes(profile);
         }
         finally
         {
@@ -22,14 +23,17 @@ public class SimpleStore : IDisposable
         }
 
     }
-    public byte[]? Get(string key)
+    public UserProfile? Get(string key)
     {
         try
         {
             _lock.EnterReadLock();
             Interlocked.Increment(ref _getCount);
-            _dsta.TryGetValue(key, out var value);
-            return value;
+            if(_dsta.TryGetValue(key, out var value))
+            {
+                return JsonSerializer.Deserialize<UserProfile>(value);
+            }
+            return null;
         }
         finally
         {

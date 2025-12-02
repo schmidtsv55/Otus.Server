@@ -1,13 +1,19 @@
 ﻿using System.Text;
 using NBomber.CSharp;
 using Otus.NBomber.ConsoleApp;
+using Otus.NBomber.ConsoleApp.DTO;
 
 NBomber.Contracts.ScenarioProps scenario = Scenario.Create("Set Scenario ", async context =>
 {
     using Client client = new();
     await client.ConnectAsync();
-
-    string sendResult = await client.SetAsync(Generate(4), Encoding.UTF8.GetBytes(Generate(4)));
+    UserProfile userProfile = new()
+    {
+        Id = Random.Shared.Next(),
+        Username = Generate(4),
+        CreatedAt = DateTime.Now
+    };
+    string sendResult = await client.SetAsync(Generate(4), userProfile);
 
     return sendResult.Trim() == "OK"
                     ? Response.Ok()
