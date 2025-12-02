@@ -32,7 +32,7 @@ public class Client : IDisposable
         {
             throw new NullReferenceException("Not connect");
         }
-        int size = args.Sum(x => x.Length);
+        int size = args.Sum(x => x.Length) + args.Length - 1;
         ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
 
         byte[] buffer = arrayPool.Rent(size);
