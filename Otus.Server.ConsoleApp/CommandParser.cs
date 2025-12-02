@@ -3,6 +3,7 @@ namespace Otus.Server.ConsoleApp;
 public static class CommandParser
 {
     private static byte space = 32;
+    private static byte empty = 0;
 
     public static CommandParts<ReadOnlySpan<byte>>
         Parse(ReadOnlySpan<byte> input)
@@ -32,7 +33,7 @@ public static class CommandParser
         {
             Command = input[..firstIndex],
             Key = input.Slice(firstIndex + 1, secondIndex),
-            Value = input[(firstIndex + secondIndex + 2)..]
+            Value = input[(firstIndex + secondIndex + 2)..].Trim(empty)
         };
 
     }

@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 
 namespace Otus.Server.ConsoleApp;
 
@@ -70,7 +71,7 @@ public class TcpServer : IDisposable
         }
         finally
         {
-            arrayPool.Return(buffer);
+            arrayPool.Return(buffer, clearArray: true);
             clientSocket.Shutdown(SocketShutdown.Receive);
             clientSocket.Close();
             clientSocket.Dispose();
@@ -86,12 +87,13 @@ public class TcpServer : IDisposable
         }
         else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.GetCommand))
         {
-            byte[]? value = _simpleStore.Get(Encoding.UTF8.GetString(commandParts.Key));
-            return value == null || value.Length == 0 ? TcpServerResponses.Nil : value;
+            UserProfile? userProfile = _simpleStore.Get(Encoding.UTF8.GetString(commandParts.Key));
+            return userProfile == null ? TcpServerResponses.Nil : JsonSerializer.SerializeToUtf8Bytes(userProfile);
         }
-        else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.SetCommand))
+        else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.SetCommand) && !commandParts.Value.IsEmpty)
         {
-            _simpleStore.Set(Encoding.UTF8.GetString(commandParts.Key), commandParts.Value.ToArray());
+            UserProfile? userProfile = JsonSerializer.Deserialize<UserProfile>(commandParts.Value);
+            _simpleStore.Set(Encoding.UTF8.GetString(commandParts.Key), userProfile);
             return TcpServerResponses.Ok;
         }
         else if (commandParts.Command.SequenceEqual(SimpleStoreCommands.DeleteCommand))
