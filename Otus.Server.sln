@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otus.NBomber.ConsoleApp", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otus.Server.BinaryGeneratorLibrary", "Otus.Server.BinaryGeneratorLibrary\Otus.Server.BinaryGeneratorLibrary.csproj", "{CF65A90C-69EA-4290-8C6E-E775E70C34BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otus.BenchmarkDotNet.ConsoleApp", "Otus.BenchmarkDotNet.ConsoleApp\Otus.BenchmarkDotNet.ConsoleApp.csproj", "{E8011570-20C7-40BD-B51D-11A637BFED77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{CF65A90C-69EA-4290-8C6E-E775E70C34BA}.Release|x64.Build.0 = Release|Any CPU
 		{CF65A90C-69EA-4290-8C6E-E775E70C34BA}.Release|x86.ActiveCfg = Release|Any CPU
 		{CF65A90C-69EA-4290-8C6E-E775E70C34BA}.Release|x86.Build.0 = Release|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Debug|x64.Build.0 = Debug|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Debug|x86.Build.0 = Debug|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Release|x64.ActiveCfg = Release|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Release|x64.Build.0 = Release|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Release|x86.ActiveCfg = Release|Any CPU
+		{E8011570-20C7-40BD-B51D-11A637BFED77}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

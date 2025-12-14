@@ -227,7 +227,7 @@ $"            this.{propertyName} = reader.ReadInt32();");
         string toBinary = 
             $$"""
                           writer.Write(this.{{propertyName}}.HasValue);
-                          if (this.{{propertyName}}.HasValue) { writer.Write(BitConverter.GetBytes(this.{{propertyName}}.Value.Ticks));} 
+                          if (this.{{propertyName}}.HasValue) { writer.Write(this.{{propertyName}}.Value.Ticks);} 
               """;
         string fromBinary = $$"""
                                           if (reader.ReadBoolean())
@@ -259,7 +259,7 @@ $"            this.{propertyName} = reader.ReadInt32();");
     private (string toBinary, string fromBinary) CreateReadWriteBinaryFromDateTime(string propertyName)
     {
         return (
-$"            writer.Write(BitConverter.GetBytes(this.{propertyName}.Ticks));",
+$"            writer.Write(this.{propertyName}.Ticks);",
 $"            this.{propertyName} = new DateTime(reader.ReadInt64());");
     }
     private (string toBinary, string fromBinary) CreateReadWriteBinaryFromBoolean(string propertyName)
