@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Otus.Server.BinaryGeneratorLibrary\Otus.Server.BinaryGeneratorLibrary.csproj" OutputItemType="Analyzer"/>
+  </ItemGroup>
+
 </Project>
