@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Otus.Server.BinaryGeneratorLibrary;
@@ -349,7 +350,8 @@ $"            this.{propertyName} = new DateTime(reader.ReadInt64());");
         var propertyDeclarations =
             classDeclarationSyntax
                 .Members.OfType<PropertyDeclarationSyntax>()
-                .Select(x => (x.Identifier.Text, context.SemanticModel.GetTypeInfo(x.Type)))
+                .Where(m => m.Modifiers.Any(SyntaxKind.PublicKeyword))
+                .Select(x => (x.Identifier.Text, ModelExtensions.GetTypeInfo(context.SemanticModel, x.Type)))
                 .ToArray();
         
         return (classInfo, propertyDeclarations);
