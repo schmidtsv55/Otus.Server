@@ -15,7 +15,18 @@ public class SimpleStore : IDisposable
         {
             _lock.EnterWriteLock();
             Interlocked.Increment(ref _setCount);
-            _dsta[key] = profile == null ? null : JsonSerializer.SerializeToUtf8Bytes(profile);
+            if (profile == null)
+            {
+                _dsta[key] = null;
+            }
+            else
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    profile.SerializeToBinary(ms);
+                    _dsta[key] = ms.ToArray();
+                }
+            }
         }
         finally
         {
@@ -29,9 +40,14 @@ public class SimpleStore : IDisposable
         {
             _lock.EnterReadLock();
             Interlocked.Increment(ref _getCount);
-            if(_dsta.TryGetValue(key, out var value))
+            if (_dsta.TryGetValue(key, out var value) && value != null)
             {
-                return JsonSerializer.Deserialize<UserProfile>(value);
+                using (MemoryStream stream = new MemoryStream(value))
+                {
+                    UserProfile profile = new UserProfile();
+                    profile.DeserializeFromBinary(stream);
+                    return profile;
+                }
             }
             return null;
         }
@@ -46,7 +62,7 @@ public class SimpleStore : IDisposable
         try
         {
             _lock.EnterWriteLock();
-             Interlocked.Increment(ref _deleteCount);
+            Interlocked.Increment(ref _deleteCount);
             _dsta.Remove(key);
         }
         finally
